@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital clock</title>
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap');
+
+        :root {
+            --font: 'Play', sans-serif;
+            --bg: #2f363e;
+            --c: #fff;
+            --circle_s: #eb0b56;
+            --circle_m: #34b638;
+            --circle_h: #fde721;
+            --brd: rgba(0, 0, 0, 0.5);
+            --bx: 5px 5px 15px rgba(0, 0, 0, 0.25),
+                5px 15px 15px rgba(0, 0, 0, 0.25),
+                inset 5px 5px 10px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 20px rgba(255, 255, 255, 0.2),
+                inset -5px -5px 15px rgba(0, 0, 0, 0.75);
+            --bx02:
+                5px 5px 10px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 20px rgb(255 255 255 / 20%),
+                inset -5px -5px 15px rgb(0 0 0 / 75%);
+            --bx03:
+                5px 5px 7px rgba(0, 0, 0, 0.28),
+                inset 2px 2px 5px rgba(102, 102, 102, 0.28),
+                inset -3px -3px 5px rgba(0, 0, 0, 0.28);
+
+        }
+
+        body.dark {
+            --bg: #e8eaec;
+            --c: #333;
+            --brd: none;
+            --circle_s: #02b7ff;
+            --circle_m: #ff6100;
+            --circle_h: #4949e7;
+            --bx: 7px 7px 15px rgba(69, 86, 103, 0.329),
+                -8px -8px 15px rgb(81 101 121 / 4%),
+                inset -5px -4px 13px 0px rgb(81 101 121 / 35%),
+                inset 6px 7px 12px 0px rgb(255 255 255 / 94%);
+            --bx02:
+                5px 5px 10px rgba(69, 86, 103, 0.329),
+                inset 5px 5px 20px rgba(255, 255, 255, 0.92),
+                inset -5px -5px 15px rgb(81 101 121 / 35%);
+            --bx03:
+                5px 5px 7px rgba(69, 86, 103, 0.329),
+                inset 2px 2px 5px rgba(255, 255, 255, 0.92),
+                inset -3px -3px 5px rgb(81 101 121 / 35%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font);
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        .drak-light {
+
+            display: flex;
+            position: absolute;
+            justify-content: center;
+            align-items: center;
+            top: 50px;
+            width: 60px;
+            height: 60px;
+            right: 50px;
+            box-shadow: var(--bx03);
+            border-radius: 50%;
+        }
+
+        .drak-light i {
+            position: absolute;
+            color: var(--c);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease
+        }
+
+        .drak-light i.sun {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .drak-light.active i.sun {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .drak-light.active i.moon {
+            pointer-events: none;
+            opacity: 0;
+        }
+
+
+        section {
+            position: relative;
+            background: var(--bg);
+            border-radius: 20px;
+            border-top-left-radius: 225px;
+            border-top-right-radius: 225px;
+            box-shadow: var(--bx);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #time {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            background: var(--bg);
+            border-radius: 50%;
+            box-shadow: var(--bx);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        #time .circle {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #time .circle svg {
+            position: relative;
+            transform: rotate(270deg);
+        }
+
+        #time .circle:nth-child(1) svg {
+            width: 250px;
+            height: 250px;
+        }
+
+        #time .circle:nth-child(2) svg {
+            width: 210px;
+            height: 210px;
+        }
+
+        #time .circle:nth-child(3) svg {
+            width: 170px;
+            height: 170px;
+        }
+
+        #time .circle svg circle {
+            width: 100%;
+            height: 100%;
+            fill: transparent;
+            stroke-width: 2;
+            transform: translate(5px, 5px);
+        }
+
+        #time .circle:nth-child(1) svg circle {
+            stroke-dasharray: 760;
+            stroke-dashoffset: 760;
+            stroke: var(--circle_s);
+
+        }
+
+        #time .circle:nth-child(2) svg circle {
+            stroke-dasharray: 630;
+            stroke-dashoffset: 630;
+            stroke: var(--circle_m);
+
+        }
+
+        #time .circle:nth-child(3) svg circle {
+            stroke-dasharray: 510;
+            stroke-dashoffset: 510;
+            stroke: var(--circle_h);
+
+        }
+
+        #time .circle .dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 10
+        }
+
+        #time .circle:nth-child(1) .dots::before,
+        #time .circle:nth-child(2) .dots::before,
+        #time .circle:nth-child(3) .dots::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--circle_s);
+            box-shadow: 0 0 20px var(--circle_s),
+                0 0 40px var(--circle_s),
+                0 0 60px var(--circle_s),
+                0 0 80px var(--circle_s);
+
+        }
+
+        #time .circle:nth-child(2) .dots::before {
+
+            background: var(--circle_m);
+            box-shadow: 0 0 20px var(--circle_m),
+                0 0 40px var(--circle_m),
+                0 0 60px var(--circle_m),
+                0 0 80px var(--circle_m);
+
+        }
+
+        #time .circle:nth-child(3) .dots::before {
+
+            background: var(--circle_h);
+            box-shadow: 0 0 20px var(--circle_h),
+                0 0 40px var(--circle_h),
+                0 0 60px var(--circle_h),
+                0 0 80px var(--circle_h);
+
+        }
+
+        .clk {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .clk span {
+            position: absolute;
+            inset: 30px;
+            color: #777777;
+            text-align: center;
+            transform: rotate(calc(30deg * var(--i)));
+        }
+
+        .clk span b {
+            font-size: 2rem;
+            font-weight: 600;
+            display: inline-block;
+            transform: rotate(calc(-30deg * var(--i)));
+        }
+
+        .timeBx {
+            margin-bottom: 40px;
+            display: flex;
+            padding: 10px 20px;
+            font-size: 25px;
+            font-weight: 600;
+            gap: 20px;
+            border: 2px solid var(--brd);
+            border-radius: 40px;
+            box-shadow: var(--bx02)
+        }
+
+
+
+
+        .timeBx #hours::after,
+        .timeBx #minutes::after {
+            content: ':';
+            position: absolute;
+        }
+
+        .timeBx #hours {
+            color: var(--circle_h);
+            text-shadow: 0 0 10px var(--circle_h),
+                0 0 20px var(--circle_h);
+        }
+
+        .timeBx #minutes {
+            color: var(--circle_m);
+            text-shadow: 0 0 10px var(--circle_m),
+                0 0 20px var(--circle_m);
+        }
+
+        .timeBx #seconds {
+            color: var(--circle_s);
+            text-shadow: 0 0 10px var(--circle_s),
+                0 0 20px var(--circle_s);
+        }
+
+        .ap {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--c);
+        }
+
+        .ap {
+            color: var(--c);
+            text-shadow: 0 0 10px var(--c),
+                0 0 20px var(--c);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="drak-light active">
+        <i class="bx bx-moon moon"></i>
+        <i class="bx bx-sun sun"></i>
+    </div>
+    <section>
+        <div id="time">
+            <div class="circle circle_s">
+                <div class="dots sec_dot"></div>
+                <svg>
+                    <circle cx="120" cy="120" r="120" id="ss">
+                    </circle>
+                </svg>
+            </div>
+
+            <div class="circle circle_m">
+                <div class="dots min_dot"></div>
+                <svg>
+                    <circle cx="100" cy="100" r="100" id="mm">
+                    </circle>
+                </svg>
+            </div>
+
+            <div class="circle circle_h">
+                <div class="dots hr_dot"></div>
+                <svg>
+                    <circle cx="80" cy="80" r="80" id="hh">
+                    </circle>
+                </svg>
+            </div>
+
+            <div class="clk">
+                <span style="--i:1"><b>1</b></span>
+                <span style="--i:2"><b>2</b></span>
+                <span style="--i:3"><b>3</b></span>
+                <span style="--i:4"><b>4</b></span>
+                <span style="--i:5"><b>5</b></span>
+                <span style="--i:6"><b>6</b></span>
+                <span style="--i:7"><b>7</b></span>
+                <span style="--i:8"><b>8</b></span>
+                <span style="--i:9"><b>9</b></span>
+                <span style="--i:10"><b>10</b></span>
+                <span style="--i:11"><b>11</b></span>
+                <span style="--i:12"><b>12</b></span>
+            </div>
+        </div>
+
+        <div class="timeBx">
+            <div id="hours">00</div>
+            <div id="minutes">00</div>
+            <div id="seconds">00</div>
+            <div class="ap">
+                <div id="ampm"></div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        setInterval(() => {
+            let hh = document.getElementById('hh');
+            let mm = document.getElementById('mm');
+            let ss = document.getElementById('ss');
+
+
+
+            let sec_dot = document.querySelector('.sec_dot');
+            let min_dot = document.querySelector('.min_dot');
+            let hr_dot = document.querySelector('.hr_dot');
+
+
+
+            let hours = document.getElementById('hours');
+            let minutes = document.getElementById('minutes');
+            let seconds = document.getElementById('seconds');
+            let ampm = document.getElementById('ampm');
+
+
+
+            let h = new Date().getHours();
+            let m = new Date().getMinutes();
+            let s = new Date().getSeconds();
+
+
+            let am = h >= 12 ? "PM" : "AM";
+
+
+            //Convert 24hr clock to 12 hr clock system
+
+            if (h > 12) {
+                h = h - 12;
+            }
+
+            //add zero before single digit numbers
+
+            h = (h < 10) ? "0" + h : h;
+            m = (m < 10) ? "0" + m : m;
+            s = (s < 10) ? "0" + s : s;
+
+
+
+            hours.innerHTML = h;
+            minutes.innerHTML = m;
+            seconds.innerHTML = s;
+            ampm.innerHTML = am;
+
+
+
+            hh.style.strokeDashoffset = 510 - (510 * h) / 12;
+            //12 hrs clock
+
+            mm.style.strokeDashoffset = 630 - (630 * m) / 60;
+            //60 minutes
+
+            ss.style.strokeDashoffset = 760 - (760 * s) / 60;
+            //60 seconds
+
+
+
+            sec_dot.style.transform = `rotateZ(${s * 6}deg)`;
+            // 360/60sec = 6
+
+            min_dot.style.transform = `rotateZ(${m * 6}deg)`;
+            // 360/60min = 6
+
+            hr_dot.style.transform = `rotateZ(${h * 30}deg)`;
+            // 360/12hrs = 30
+
+        });
+
+
+
+        const body = document.querySelector("body"),
+            modeToggle = document.querySelector(".drak-light");
+
+        modeToggle.addEventListener("click", () => {
+            modeToggle.classList.toggle("active");
+            body.classList.toggle("dark");
+            if (!body.classList.contains("dark")) {
+                localStorage.setItem("mode", "light-mode");
+            }
+            else {
+                localStorage.setItem("mode", "dark-mode");
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>
